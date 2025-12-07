@@ -4,6 +4,7 @@ const dotenv = require('dotenv');
 const cors = require('cors');
 const connectDB = require('./config/db');
 const adminAuthRoutes = require('./routes/adminAuth.routes');
+const adminProfileRoutes = require('./routes/adminProfile.routes'); // ← new
 
 dotenv.config();
 connectDB();
@@ -16,6 +17,7 @@ app.use(express.json());
 
 // Routes
 app.use('/api/admin', adminAuthRoutes);
+app.use('/api/admin/profile', adminProfileRoutes); // ← protected profile routes
 
 // Test route
 app.get('/', (req, res) => {
