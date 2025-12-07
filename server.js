@@ -11,7 +11,7 @@ console.log('✅ .env loaded | Cloudinary keys:', {
 // ✅ STEP 2: Now import everything else
 const express = require('express');
 const cors = require('cors');
-const mongoose = require('mongoose'); // ← ADDED for ObjectId validation
+const mongoose = require('mongoose'); // ← for ObjectId validation
 const connectDB = require('./config/db');
 
 // Routes
@@ -19,6 +19,7 @@ const adminAuthRoutes = require('./routes/adminAuth.routes');
 const adminProfileRoutes = require('./routes/adminProfile.routes');
 const productRoutes = require('./routes/products.routes');
 const vacancyRoutes = require('./routes/vacancies.routes');
+const contactRoutes = require('./routes/contact.routes'); // ← NEW
 
 // ✅ These NOW run AFTER dotenv is loaded
 const Product = require('./models/Product');
@@ -39,6 +40,10 @@ app.use('/api/admin', adminAuthRoutes);
 app.use('/api/admin/profile', adminProfileRoutes);
 app.use('/api/vacancies', vacancyRoutes);
 app.use('/api/admin/vacancies', auth, vacancyRoutes);
+
+// 🔹 Contact Form Routes
+app.use('/api/contact', contactRoutes); // Public: POST /api/contact
+app.use('/api/admin/contact', auth, contactRoutes); // Admin: GET /api/admin/contact/messages
 
 // 🔹 Admin: Upload new product
 app.post('/api/admin/products', auth, upload.array('images', 4), async (req, res) => {
@@ -90,7 +95,6 @@ app.put('/api/admin/products/:id', auth, upload.array('images', 4), async (req, 
     if (stock !== undefined) product.stock = parseInt(stock, 10);
     if (category) product.category = category;
 
-    // Replace images only if new ones are uploaded
     if (req.files && req.files.length > 0) {
       product.images = req.files.map(file => file.path);
     }
@@ -124,7 +128,7 @@ app.delete('/api/admin/products/:id', auth, async (req, res) => {
   }
 });
 
-// Public product routes (GET /api/products and GET /api/products/:id)
+// Public product routes
 app.use('/api/products', productRoutes);
 
 // Test route
